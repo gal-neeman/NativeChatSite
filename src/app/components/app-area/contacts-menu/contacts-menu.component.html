@@ -1,0 +1,15 @@
+<div class="wrapper">
+    <div class="title-area">
+        <span class="line"></span>
+        <h3 class="title">Buddies</h3>
+        <span class="line"></span>
+    </div>
+
+    <div class="bots-list">
+        @for (bot of bots(); track bot.id) {
+            <app-bot-card (onDelete)="deleteBot($event)" [bot]="bot"></app-bot-card>
+        }
+    </div>
+
+    <app-new-buddy-button (onAddBot)="addBot($event)"></app-new-buddy-button>
+</div>

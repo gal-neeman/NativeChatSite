@@ -1,0 +1,50 @@
+<div class="wrapper">
+    <div class="content">
+        <form [formGroup]="registerForm" (submit)="send()">
+            <div class="input-buttons">
+                <mat-form-field>
+                    <mat-label>First Name</mat-label>
+                    <input matInput type="text" formControlName="firstNameControl" maxlength="20">
+                    <mat-error *ngIf="registerForm.controls['firstNameControl'].hasError('required')">First Name is required</mat-error>
+                    <mat-error *ngIf="registerForm.controls['firstNameControl'].hasError('minlength')">First Name is too short</mat-error>
+                </mat-form-field>
+    
+                <mat-form-field>
+                    <mat-label>Last Name</mat-label>
+                    <input matInput type="text" formControlName="lastNameControl" maxlength="40">
+                    <mat-error *ngIf="registerForm.controls['lastNameControl'].hasError('required')">Last Name is required</mat-error>
+                    <mat-error *ngIf="registerForm.controls['lastNameControl'].hasError('minlength')">Last Name is too short</mat-error>
+                </mat-form-field>
+    
+                <mat-form-field>
+                    <mat-label>Username</mat-label>
+                    <input matInput type="text" formControlName="usernameControl" maxlength="20">
+                    <mat-error *ngIf="registerForm.controls['usernameControl'].hasError('required')">Username is required</mat-error>
+                    <mat-error *ngIf="registerForm.controls['usernameControl'].hasError('minlength')">Username is too short</mat-error>
+                </mat-form-field>
+    
+                <mat-form-field>
+                    <mat-label>Email</mat-label>
+                    <input matInput type="email" formControlName="emailControl" maxlength="320">
+                    <mat-error *ngIf="registerForm.controls['emailControl'].hasError('required')">Email is required</mat-error>
+                    <mat-error *ngIf="registerForm.controls['emailControl'].hasError('minlength')
+                                        && !registerForm.controls['emailControl'].hasError('pattern')">Email is too short</mat-error>
+                    <mat-error *ngIf="registerForm.controls['emailControl'].hasError('pattern')">Email is not in email format</mat-error>
+                </mat-form-field>
+    
+                <mat-form-field>
+                    <mat-label>Password</mat-label>
+                    <input matInput type="password" formControlName="passwordControl" maxlength="800">
+                    <mat-error *ngIf="registerForm.controls['passwordControl'].hasError('required')">Password is required</mat-error>
+                    <mat-error *ngIf="registerForm.controls['passwordControl'].hasError('minlength') && !registerForm.controls['passwordControl'].hasError('required')">Password is too short</mat-error>
+                    <mat-error *ngIf="registerForm.controls['passwordControl'].hasError('nouppercase')">Password must contain uppercase letters</mat-error>
+                    <mat-error *ngIf="registerForm.controls['passwordControl'].hasError('nodigits')">Password must contain digits</mat-error>
+                    <mat-error *ngIf="registerForm.controls['passwordControl'].hasError('nononalphanumeric')">Password must contain non-alphanumeric characters</mat-error>
+                </mat-form-field>
+            </div>
+            
+            <button [disabled]="registerForm.invalid" mat-flat-button type="submit">Register</button>
+        </form>
+        <p class="new-user-text">Already have an account? <a routerLink="/login">Log In</a></p>
+    </div>
+</div>

@@ -1,1 +1,22 @@
-/* You can add global styles to this file, and also import other style files */
+html, body {
+    margin: 0;
+    padding: 0;
+    background-color: #363636;
+}
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.mat-mdc-snack-bar-container.popup-error .mdc-snackbar__surface {
+    background-color: #DC143C !important;
+    color: white !important;
+}
+
+.mat-mdc-snack-bar-container.popup-success .mdc-snackbar__surface {
+    background-color: #43a047 !important;
+    color: white !important;
+}
+
+.mat-mdc-snack-bar-container.popup-warning .mdc-snackbar__surface {
+    background-color: #FF9800 !important;
+    color: white !important;
+}

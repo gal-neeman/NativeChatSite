@@ -1,0 +1,28 @@
+.wrapper {
+    height: fit-content;
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+}
+
+.title-area {
+    margin: auto;
+    color: #fbfbfa;
+}
+
+.options-area {
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+    margin: auto;
+}
+
+.buttons-area {
+    width: fit-content;
+    margin-left: auto;
+}
+
+.buttons-area > * {
+    margin-left: 5px;
+}

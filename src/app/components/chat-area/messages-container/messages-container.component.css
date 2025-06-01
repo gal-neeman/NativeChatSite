@@ -1,0 +1,7 @@
+.wrapper {
+    overflow: auto;
+    max-height: 80vh;
+    width: 100%;
+    scrollbar-width: thin;
+    scrollbar-color: #888 #2c2c2c;
+}

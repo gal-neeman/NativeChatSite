@@ -1,0 +1,17 @@
+<div class="wrapper" [matMenuTriggerFor]="menu">
+    @if (initials()) {
+        <span class="initials">{{initials()}}</span>
+    }
+</div>
+
+<mat-menu #menu="matMenu">
+    <div class="menu-logout menu-item" (click)="logout()" mat-menu-item>
+        <button id="logout-button">Log Out</button>
+
+        <mat-icon>logout</mat-icon>
+    </div>
+
+    <div class="menu-tag-wrapper">
+        <span class="menu-tag">{{username() | titlecase}}</span>
+    </div>
+</mat-menu>

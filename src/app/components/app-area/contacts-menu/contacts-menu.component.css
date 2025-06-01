@@ -1,0 +1,29 @@
+.wrapper {
+    width: 100%; 
+    height: 100%;
+    background-color: #2f2f2f;
+}
+
+.title-area {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    padding-top: 20px;
+}
+
+.line {
+    width: 30%;
+    height: 4px;
+    background-color: #5a5959;
+    border-radius: 10px;
+}
+
+.title {
+    color: #5a5959;
+    margin: 0;
+    padding: 0;
+}
+
+.bots-list {
+    margin-top: 15px;
+}

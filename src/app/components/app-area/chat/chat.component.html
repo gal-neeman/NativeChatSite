@@ -1,0 +1,7 @@
+<div class="wrapper">
+    <app-messages-container [messages]="this.chat()" [user]="user" [bot]="bot"></app-messages-container>
+
+    <div class="input-area">
+        <app-message-box (messageSent)="onMessageSent($event)"></app-message-box>
+    </div>
+</div>

@@ -1,0 +1,24 @@
+<div class="wrapper">
+    <div class="content">
+        <form [formGroup]="loginForm" (submit)="send()">
+            <mat-form-field>
+                <mat-label>Email</mat-label>
+                <input matInput type="email" formControlName="emailControl" maxlength="320">
+                <mat-error *ngIf="loginForm.controls['emailControl'].hasError('required')">Email is required</mat-error>
+                <mat-error *ngIf="loginForm.controls['emailControl'].hasError('minlength')
+                                    && !loginForm.controls['emailControl'].hasError('pattern')">Email is too short</mat-error>
+                <mat-error *ngIf="loginForm.controls['emailControl'].hasError('pattern')">Email is not in email format</mat-error>
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>Password</mat-label>
+                <input matInput type="password" formControlName="passwordControl" maxlength="800">
+                <mat-error *ngIf="loginForm.controls['passwordControl'].hasError('required')">password is required</mat-error>
+                <mat-error *ngIf="loginForm.controls['passwordControl'].hasError('minlength')">password is too short</mat-error>
+            </mat-form-field>
+            
+            <button [disabled]="loginForm.invalid" mat-flat-button type="submit">Log In</button>
+        </form>
+        <p class="new-user-text">Don't have an account? <a routerLink="/register">Register</a></p>
+    </div>
+</div>

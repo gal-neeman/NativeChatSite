@@ -1,0 +1,30 @@
+<div class="wrapper">
+    <div class="title-area">
+        <h2>Add A Buddy</h2>
+    </div>
+
+    <form [formGroup]="buddyForm">
+        <div class="options-area">
+            <mat-form-field class="option">
+                <mat-label>Name</mat-label>
+                <input matInput type="text" formControlName="nameControl">
+            </mat-form-field>
+    
+            <mat-form-field class="option">
+                <mat-label>Language</mat-label>
+                <mat-select value="1" formControlName="languageControl">
+                    <mat-option value="1">English</mat-option>
+                    <mat-option value="2">Spanish</mat-option>
+                    <mat-option value="3">Russian</mat-option>
+                    <mat-option value="4">Japanese</mat-option>
+                    <mat-option value="5">Hebrew</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+    
+        <div class="buttons-area">
+            <button mat-flat-button (click)="onSubmit()" [disabled]="buddyForm.invalid">Add</button>
+            <button mat-flat-button (click)="onCancel()">Cancel</button>
+        </div>
+    </form>
+</div>

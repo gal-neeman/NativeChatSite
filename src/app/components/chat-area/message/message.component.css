@@ -1,0 +1,44 @@
+.wrapper {
+    display: flex;
+    height: fit-content;
+    margin-bottom: 5px;
+    margin-left: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    margin: 5px 3px 0 0;
+}
+
+.wrapper:hover {
+    background-color: rgb(75, 73, 73);
+}
+
+.right-side {
+    margin-left: 10px;
+}
+
+.sender-name {
+    color: #fbfbfa;
+    font-weight: 500;
+}
+
+p {
+    margin: 0;
+}
+
+.content {
+    width: 90%;
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 5px 0 5px 40px;
+    color: #dfdfd7;
+}
+
+.error {
+    margin-left: 40px;
+    color: #FCEAEA;
+    background-color: #EF5350;
+    width: fit-content;
+    padding: 5px 15px 5px 15px;
+    border-radius: 5px;
+}

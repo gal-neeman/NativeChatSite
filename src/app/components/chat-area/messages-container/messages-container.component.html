@@ -1,4 +1,4 @@
-<div class="wrapper">
+<div class="wrapper" #messagesContainer>
     @for (message of messages; track message.id) {
         <app-message [message]="message" [sender]="getSenderAgent(message)"></app-message>
     }

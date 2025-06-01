@@ -16,7 +16,7 @@ export class MessageBoxComponent implements AfterViewInit {
   @Output()
   public messageSent = new EventEmitter<string>();
 
-  public nickname = computed(() => this.contactSelectionService.getContact().name);
+  public nickname = computed(() => this.contactSelectionService.getContact()?.name ?? null);
 
   private readonly contactSelectionService = inject(ContactSelectionService);
 

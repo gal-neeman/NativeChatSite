@@ -1,3 +1,5 @@
-<div class="wrapper">
-    <textarea #messageBox class="message-box" id="messagebox" [placeholder]="'Message @' + nickname()" (keydown)="onKeyDown($event)" (input)="onInput($event)"></textarea>
-</div>
+@if (nickname) {
+    <div class="wrapper">
+        <textarea #messageBox class="message-box" id="messagebox" [placeholder]="'Message @' + nickname()" (keydown)="onKeyDown($event)" (input)="onInput($event)"></textarea>
+    </div>
+}

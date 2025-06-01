@@ -1,4 +1,4 @@
-<div class="wrapper" (click)="selectContact()">
+<div class="wrapper" (click)="selectContact()" [class.isActive]="isSelected()">
     <div class="left-side">
         <app-bot-badge [initials]="bot.language.name[0]"></app-bot-badge>
     

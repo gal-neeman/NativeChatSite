@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, inject, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, EventEmitter, inject, Input, Output } from '@angular/core';
 import { BotBadgeComponent } from "../bot-badge/bot-badge.component";
 import { Bot } from '../../../models/bot.model';
 import { TitleCasePipe } from '@angular/common';
@@ -23,6 +23,8 @@ export class BotCardComponent {
 
   private readonly dialog = inject(MatDialog);
   private readonly contactSelectionService = inject(ContactSelectionService);
+
+  public isSelected = computed(() => this.contactSelectionService.getContact()?.id == this.bot.id);
 
   public confirmDelete() : void {
     const dialogRef = this.dialog.open(ConfirmDeleteBotComponent);

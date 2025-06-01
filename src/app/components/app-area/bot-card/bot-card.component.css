@@ -1,5 +1,6 @@
 .wrapper {
     margin: auto;
+    margin-top: 2px;
     width: 90%;
     display: flex;
     justify-content: space-between;
@@ -64,4 +65,8 @@ button {
     color: inherit;
     background-color: inherit;
     border: 0;
+}
+
+.isActive {
+    background-color: #444444;
 }

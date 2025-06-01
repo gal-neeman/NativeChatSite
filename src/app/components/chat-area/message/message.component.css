@@ -30,7 +30,7 @@ p {
     display: flex;
     align-items: center;
     margin: 0;
-    padding: 5px 0 5px 40px;
+    padding: 0px 0 5px 40px;
     color: #dfdfd7;
 }
 
@@ -41,4 +41,8 @@ p {
     width: fit-content;
     padding: 5px 15px 5px 15px;
     border-radius: 5px;
+}
+
+.padded-text {
+    margin-left: 50px;
 }

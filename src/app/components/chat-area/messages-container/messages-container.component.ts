@@ -44,4 +44,14 @@ export class MessagesContainerComponent implements AfterViewChecked {
 
     return null;
   }
+
+  public isFirstFromSender(message: Message) : boolean {
+    const index = this.messages.indexOf(message);
+    
+    if (index > 0) {
+      return this.messages[index - 1].senderId == message.senderId;
+    }
+
+    return false;
+  }
 }

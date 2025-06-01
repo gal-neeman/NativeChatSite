@@ -1,5 +1,5 @@
 <div class="wrapper" #messagesContainer>
     @for (message of messages; track message.id) {
-        <app-message [message]="message" [sender]="getSenderAgent(message)"></app-message>
+        <app-message [message]="message" [sender]="getSenderAgent(message)" [isFirstMessage]="isFirstFromSender(message)"></app-message>
     }
 </div>

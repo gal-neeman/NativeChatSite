@@ -1,12 +1,17 @@
 <div class="wrapper">
     @if (sender != null) {
         <div class="content">
-            <app-bot-badge [initials]="senderName()[0].toUpperCase()"></app-bot-badge>
-    
-            <div class="right-side">
-                <p class="sender-name">{{senderName()}}</p>
-                <p class="text">{{message.content}}</p>
-            </div>
+            @if (!isFirstMessage) {
+                <app-bot-badge [initials]="senderName()[0].toUpperCase()"></app-bot-badge>
+        
+                <div class="right-side">
+                    <p class="sender-name">{{senderName()}}</p>
+                    <p class="text">{{message.content}}</p>
+                </div>
+            }
+            @else {
+                <p class="padded-text">{{message.content}}</p>
+            }
         </div>
     }
     @else {

@@ -21,8 +21,8 @@ export class BotCardComponent {
   @Output()
   public onDelete = new EventEmitter<Bot>();
 
-  private dialog = inject(MatDialog);
-  private contactSelectionService = inject(ContactSelectionService);
+  private readonly dialog = inject(MatDialog);
+  private readonly contactSelectionService = inject(ContactSelectionService);
 
   public confirmDelete() : void {
     const dialogRef = this.dialog.open(ConfirmDeleteBotComponent);

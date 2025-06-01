@@ -1,5 +1,6 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, computed, ElementRef, EventEmitter, inject, Output, ViewChild } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
+import { ContactSelectionService } from '../../../services/contactSelection.service';
 
 @Component({
   selector: 'app-message-box',
@@ -14,6 +15,10 @@ export class MessageBoxComponent implements AfterViewInit {
 
   @Output()
   public messageSent = new EventEmitter<string>();
+
+  public nickname = computed(() => this.contactSelectionService.getContact().name);
+
+  private readonly contactSelectionService = inject(ContactSelectionService);
 
   ngAfterViewInit(): void {
     this.resizeMessagebox(this.messageBox.nativeElement);

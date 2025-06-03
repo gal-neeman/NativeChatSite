@@ -1,6 +1,6 @@
 const version = 'v1';
-const port = '5000';
-const path = `http://localhost:${port}/api/${version}`;
+const port = '7152';
+const path = `https://localhost:${port}/api/${version}`;
 
 export const environment = {
     loginUrl: `${path}/user/login`,

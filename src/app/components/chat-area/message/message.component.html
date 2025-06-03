@@ -3,9 +3,12 @@
         <div class="content">
             @if (!isFirstMessage) {
                 <app-bot-badge [initials]="senderName()[0].toUpperCase()"></app-bot-badge>
-        
+                
                 <div class="right-side">
-                    <p class="sender-name">{{senderName()}}</p>
+                    <div class="name-area">
+                        <p class="sender-name">{{senderName()}}</p>
+                        <p class="time-stamp">{{formattedTime}}</p>
+                    </div>
                     <p class="text">{{message.content}}</p>
                 </div>
             }

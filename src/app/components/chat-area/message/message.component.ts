@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, Input, OnInit, signal } from '@angu
 import { Message } from '../../../models/message.model';
 import { ChatAgent } from '../../../models/chatAgent.model';
 import { BotBadgeComponent } from "../../app-area/bot-badge/bot-badge.component";
+import moment from 'moment';
 
 @Component({
   selector: 'app-message',
@@ -21,9 +22,12 @@ export class MessageComponent implements OnInit {
   public isFirstMessage: boolean;
 
   public senderName = signal<string | null>(null);
+  public formattedTime : string;
 
   ngOnInit() {
     if (this.sender)
       this.senderName.set(this.sender.name)
+
+    this.formattedTime = moment(this.message.createdAt).utc(true).tz("Asia/Jerusalem").format("HH:mm");
   }
 }

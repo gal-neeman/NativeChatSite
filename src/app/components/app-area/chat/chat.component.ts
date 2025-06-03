@@ -4,12 +4,12 @@ import { Bot } from '../../../models/bot.model';
 import { ContactSelectionService } from '../../../services/contactSelection.service';
 import { Message } from '../../../models/message.model';
 import { MessageService } from '../../../services/message.service';
-import { MessageComponent } from '../../chat-area/message/message.component';
 import { UserService } from '../../../services/user.service';
 import { User } from '../../../models/user.model';
-import { ChatAgent } from '../../../models/chatAgent.model';
 import { MessageDto } from '../../../models/messageDto.model';
 import { MessagesContainerComponent } from "../../chat-area/messages-container/messages-container.component";
+import {v4 as uuidv4} from 'uuid';
+import moment from 'moment';
 
 @Component({
   selector: 'app-chat',
@@ -23,10 +23,11 @@ export class ChatComponent implements OnInit{
   public chat = signal<Message[]>([]);
   public user : User;
 
+  private tempMessages : Message[] = [];
+
   private readonly contactSelectionService = inject(ContactSelectionService);
   private readonly messageService = inject(MessageService);
   private readonly userService = inject(UserService);
-
 
   constructor() {
     effect(() => {
@@ -43,7 +44,7 @@ export class ChatComponent implements OnInit{
   }
 
   public async handleContactChange() {
-    this.chat.set(await this.messageService.getChatMessages(this.bot.id));
+    this.chat.set((await this.messageService.getChatMessages(this.bot.id)));
   }
 
   public async onMessageSent(messageContent: string) {
@@ -53,8 +54,29 @@ export class ChatComponent implements OnInit{
       receiverId: this.bot.id,
       senderId: this.user.id
     }
-  
-    const dbMessage = await this.messageService.sendMessage(message);
-    this.chat.update(() => [...this.chat(), dbMessage])
+
+    const tempMessage = this.generateTempMessage(message);
+    this.tempMessages.push(tempMessage);
+
+    this.chat.update(() => [...this.chat(), tempMessage]);
+    const messageResponse = await this.messageService.sendMessage(message);
+
+    this.chat.update(() => [...this.chat(), messageResponse.responseMessage]);
+    this.chat.update(() => this.chat().filter(m => m.id != tempMessage.id));
+    this.chat.update(() => [...this.chat(), messageResponse.receivedMessage].sort((a, b) => moment(a.createdAt).isAfter(b.createdAt) ? 1 : -1 ));
+
+    this.tempMessages = this.tempMessages.filter(m => m.id != tempMessage.id);
+  }
+
+  private generateTempMessage(message: MessageDto) : Message {
+    const tempMessage : Message = {
+      content: message.content,
+      createdAt: new Date(message.createdAt),
+      id: uuidv4(),
+      receiverId: message.receiverId,
+      senderId: message.senderId
+    }
+
+    return tempMessage;
   }
 }

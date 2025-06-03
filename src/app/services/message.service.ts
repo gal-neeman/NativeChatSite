@@ -17,18 +17,19 @@ export class MessageService {
         const messages$ = this.http.get<Message[]>(`${environment.messagesUrl}${botId}`);
         let messages = await firstValueFrom(messages$);
 
+        messages = messages.map(m => ({
+            content: m.content,
+            createdAt: moment(m.createdAt).utc(true).tz("Asia/Jerusalem").toDate(),
+            id: m.id,
+            receiverId: m.receiverId,
+            senderId: m.senderId
+        }))
         return messages;
     }
 
     public async sendMessage(message: MessageDto) : Promise<MessageResponse> {
         const message$ = this.http.post<MessageResponse>(`${environment.messagesUrl}`, message);
         const responseMessage = await firstValueFrom(message$);
-
-        console.log(responseMessage);
-
-        // Fix date format
-        responseMessage.receivedMessage.createdAt = moment.tz(responseMessage.receivedMessage.createdAt, "Asia/Jerusalem").toDate();
-        responseMessage.responseMessage.createdAt = moment.tz(responseMessage.responseMessage.createdAt, "Asia/Jerusalem").toDate();
 
         return responseMessage;
     }

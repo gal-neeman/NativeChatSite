@@ -28,6 +28,6 @@ export class MessageComponent implements OnInit {
     if (this.sender)
       this.senderName.set(this.sender.name)
 
-    this.formattedTime = moment(this.message.createdAt).utc(true).tz("Asia/Jerusalem").format("HH:mm");
+    this.formattedTime = moment(this.message.createdAt).format("HH:mm");
   }
 }

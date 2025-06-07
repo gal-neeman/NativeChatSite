@@ -8,8 +8,10 @@ import { UserService } from '../../../services/user.service';
 import { User } from '../../../models/user.model';
 import { MessageDto } from '../../../models/messageDto.model';
 import { MessagesContainerComponent } from "../../chat-area/messages-container/messages-container.component";
-import {v4 as uuidv4} from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import moment from 'moment';
+import { SocketService } from '../../../services/socket.service';
+import { EventData } from '../../../models/eventData.model';
 
 @Component({
   selector: 'app-chat',
@@ -18,16 +20,17 @@ import moment from 'moment';
   styleUrl: './chat.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ChatComponent implements OnInit{
-  public bot : Bot | null = null;
+export class ChatComponent implements OnInit {
+  public bot: Bot | null = null;
   public chat = signal<Message[]>([]);
-  public user : User;
+  public user: User;
 
-  private tempMessages : Message[] = [];
+  private tempMessages: Message[] = [];
 
   private readonly contactSelectionService = inject(ContactSelectionService);
   private readonly messageService = inject(MessageService);
   private readonly userService = inject(UserService);
+  private readonly socketService = inject(SocketService);
 
   constructor() {
     effect(() => {
@@ -41,6 +44,17 @@ export class ChatComponent implements OnInit{
 
   public ngOnInit(): void {
     this.user = this.userService.getUser();
+
+    this.socketService.messages$.subscribe(m => {
+      const tempMessage = this.tempMessages.find(tmpMsg => tmpMsg.createdAt = m.receivedMessage.createdAt);
+      if (tempMessage != null) {
+        this.tempMessages = this.tempMessages.filter(m => m.id != tempMessage.id);
+        this.chat.update(() => this.chat().filter(m => m.id != tempMessage.id));
+      }
+
+      this.chat.update(() => [...this.chat(), m.responseMessage]);
+      this.chat.update(() => [...this.chat(), m.receivedMessage].sort((a, b) => moment(a.createdAt).isAfter(b.createdAt) ? 1 : -1));
+    })
   }
 
   public async handleContactChange() {
@@ -48,7 +62,7 @@ export class ChatComponent implements OnInit{
   }
 
   public async onMessageSent(messageContent: string) {
-    const message : MessageDto = {
+    const message: MessageDto = {
       content: messageContent,
       createdAt: new Date(),
       receiverId: this.bot.id,
@@ -59,17 +73,16 @@ export class ChatComponent implements OnInit{
     this.tempMessages.push(tempMessage);
 
     this.chat.update(() => [...this.chat(), tempMessage]);
-    const messageResponse = await this.messageService.sendMessage(message);
 
-    this.chat.update(() => [...this.chat(), messageResponse.responseMessage]);
-    this.chat.update(() => this.chat().filter(m => m.id != tempMessage.id));
-    this.chat.update(() => [...this.chat(), messageResponse.receivedMessage].sort((a, b) => moment(a.createdAt).isAfter(b.createdAt) ? 1 : -1 ));
-
-    this.tempMessages = this.tempMessages.filter(m => m.id != tempMessage.id);
+    const eventData: EventData<MessageDto> = {
+      data: message,
+      eventName: 'message'
+    };
+    this.socketService.emit(eventData);
   }
 
-  private generateTempMessage(message: MessageDto) : Message {
-    const tempMessage : Message = {
+  private generateTempMessage(message: MessageDto): Message {
+    const tempMessage: Message = {
       content: message.content,
       createdAt: new Date(message.createdAt),
       id: uuidv4(),

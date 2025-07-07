@@ -20,6 +20,7 @@
     max-height: 400px;
     user-select: none;
     margin-left: 8px;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
 textarea {

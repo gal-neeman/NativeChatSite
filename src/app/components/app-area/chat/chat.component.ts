@@ -53,7 +53,8 @@ export class ChatComponent implements OnInit {
       }
 
       this.chat.update(() => [...this.chat(), m.responseMessage]);
-      this.chat.update(() => [...this.chat(), m.receivedMessage].sort((a, b) => moment(a.createdAt).isAfter(b.createdAt) ? 1 : -1));
+      if (m.receivedMessage != null)
+        this.chat.update(() => [...this.chat(), m.receivedMessage].sort((a, b) => moment(a.createdAt).isAfter(b.createdAt) ? 1 : -1));
     })
   }
 

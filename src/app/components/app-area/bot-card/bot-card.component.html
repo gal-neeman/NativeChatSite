@@ -1,6 +1,6 @@
 <div class="wrapper" (click)="selectContact()" [class.isActive]="isSelected()">
     <div class="left-side">
-        <app-bot-badge [initials]="bot.language.name[0]"></app-bot-badge>
+        <app-bot-badge [initials]="bot.name[0]"></app-bot-badge>
     
         <div class="bot-info">
             <span class="bot-language">{{bot.name | titlecase}}</span>

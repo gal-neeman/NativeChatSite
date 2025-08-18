@@ -1,12 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatInputModule } from '@angular/material/input';
 import { Router, RouterModule } from '@angular/router';
-import { credentials } from '../../../models/credentials';
-import { UserService } from '../../../services/user.service';
+import { Credentials } from '../../../models/credentials';
+import { AuthStore } from '../../../storage/auth.store';
+import { AuthStates } from '../../../models/authStates.enum';
 
 @Component({
   selector: 'app-login',
@@ -16,11 +17,17 @@ import { UserService } from '../../../services/user.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoginComponent implements OnInit {
-  private formBuilder = inject(FormBuilder);
-  private userService = inject(UserService);
-  private router = inject(Router);
+  private readonly formBuilder = inject(FormBuilder);
+  private readonly router = inject(Router);
+  private readonly authStore = inject(AuthStore);
 
   public loginForm: FormGroup;
+
+  private navOnLogin = effect(() => {
+    if (this.authStore.status() === AuthStates.authenticated) {
+      this.router.navigateByUrl("app");
+    }
+  })
 
   ngOnInit(): void {
     this.loginForm = this.formBuilder.group({
@@ -29,12 +36,11 @@ export class LoginComponent implements OnInit {
     })
   }
 
-  public async send() : Promise<void> {
-    const loginData : credentials = {
+  public send(): void {
+    const loginData: Credentials = {
       email: this.loginForm.get('emailControl').value, password: this.loginForm.get('passwordControl').value
     }
 
-    await this.userService.login(loginData);
-    this.router.navigateByUrl("app");
+    this.authStore.login(loginData);
   }
 }

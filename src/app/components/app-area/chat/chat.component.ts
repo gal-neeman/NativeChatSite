@@ -4,7 +4,6 @@ import { Bot } from '../../../models/bot.model';
 import { ContactSelectionService } from '../../../services/contactSelection.service';
 import { Message } from '../../../models/message.model';
 import { MessageService } from '../../../services/message.service';
-import { UserService } from '../../../services/user.service';
 import { User } from '../../../models/user.model';
 import { MessageDto } from '../../../models/messageDto.model';
 import { MessagesContainerComponent } from "../../chat-area/messages-container/messages-container.component";
@@ -12,8 +11,8 @@ import { v4 as uuidv4 } from 'uuid';
 import moment from 'moment';
 import { SocketService } from '../../../services/socket.service';
 import { EventData } from '../../../models/eventData.model';
-import { map, tap } from 'rxjs';
-import { MessageResponse } from '../../../models/messageResponse.model';
+import { tap } from 'rxjs';
+import { AuthStore } from '../../../storage/auth.store';
 
 @Component({
   selector: 'app-chat',
@@ -31,8 +30,8 @@ export class ChatComponent implements OnInit {
 
   private readonly contactSelectionService = inject(ContactSelectionService);
   private readonly messageService = inject(MessageService);
-  private readonly userService = inject(UserService);
   private readonly socketService = inject(SocketService);
+  private readonly authStore = inject(AuthStore);
 
   constructor() {
     effect(() => {
@@ -45,7 +44,7 @@ export class ChatComponent implements OnInit {
   }
 
   public ngOnInit(): void {
-    this.user = this.userService.getUser();
+    this.user = this.authStore.user();
 
     this.socketService.messages$
     .pipe(

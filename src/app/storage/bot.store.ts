@@ -5,19 +5,13 @@ import { inject } from "@angular/core";
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { catchError, concatMap, EMPTY, exhaustMap, filter, tap } from "rxjs";
 import { BotDto } from "../models/botDto.model";
+import { StoreStatuses } from "../models/storeStatuses.enum";
 
 export type BotState = {
     bots: Bot[] | undefined,
     status: Status,
     error?: string
 }
-
-enum StoreStatuses {
-    idle = 'idle',
-    loading = 'loading',
-    loaded = 'loaded',
-    error = 'error'
-};
 
 type Status = StoreStatuses.idle | StoreStatuses.loading | StoreStatuses.loaded | StoreStatuses.error;
 

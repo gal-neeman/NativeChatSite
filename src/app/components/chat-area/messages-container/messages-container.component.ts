@@ -4,10 +4,11 @@ import { MessageComponent } from "../message/message.component";
 import { ChatAgent } from '../../../models/chatAgent.model';
 import { Bot } from '../../../models/bot.model';
 import { User } from '../../../models/user.model';
+import { DateSeperatorComponent } from '../date-seperator/date-seperator.component';
 
 @Component({
   selector: 'app-messages-container',
-  imports: [MessageComponent],
+  imports: [MessageComponent, DateSeperatorComponent],
   templateUrl: './messages-container.component.html',
   styleUrl: './messages-container.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -53,5 +54,12 @@ export class MessagesContainerComponent implements AfterViewChecked {
     }
 
     return false;
+  }
+
+  public isDayDifferent(first: Date, second: Date) {
+    const diffMs = Math.abs(first.getTime() - second.getTime());
+    const oneDayMs = 24 * 60 * 60 * 1000;
+
+    return diffMs > oneDayMs;
   }
 }

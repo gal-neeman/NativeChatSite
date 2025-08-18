@@ -1,5 +1,8 @@
 <div class="wrapper" #messagesContainer>
-    @for (message of messages; track message.id) {
+    @for (message of messages; track $index) {
+        @if ($index > 0 && isDayDifferent(messages[$index].createdAt, messages[$index - 1].createdAt)) {
+            <app-date-seperator [date]="message.createdAt"></app-date-seperator>
+        }
         <app-message [message]="message" [sender]="getSenderAgent(message)" [isFirstMessage]="isFirstFromSender(message)"></app-message>
     }
 </div>

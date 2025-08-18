@@ -12,6 +12,8 @@ import { v4 as uuidv4 } from 'uuid';
 import moment from 'moment';
 import { SocketService } from '../../../services/socket.service';
 import { EventData } from '../../../models/eventData.model';
+import { map, tap } from 'rxjs';
+import { MessageResponse } from '../../../models/messageResponse.model';
 
 @Component({
   selector: 'app-chat',
@@ -45,7 +47,14 @@ export class ChatComponent implements OnInit {
   public ngOnInit(): void {
     this.user = this.userService.getUser();
 
-    this.socketService.messages$.subscribe(m => {
+    this.socketService.messages$
+    .pipe(
+      tap(m => {
+        m.receivedMessage.createdAt = new Date(m.receivedMessage.createdAt);
+        m.responseMessage.createdAt = new Date(m.responseMessage.createdAt);
+      }),
+    )
+    .subscribe(m => {
       const tempMessage = this.tempMessages.find(tmpMsg => tmpMsg.createdAt = m.receivedMessage.createdAt);
       if (tempMessage != null) {
         this.tempMessages = this.tempMessages.filter(m => m.id != tempMessage.id);

@@ -5,8 +5,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { Router, RouterModule } from '@angular/router';
 import { RegisterDto } from '../../../models/register.dto';
-import { UserService } from '../../../services/user.service';
 import { strongPassword } from '../../../utilities/validators';
+import { AuthStore } from '../../../storage/auth.store';
 
 @Component({
   selector: 'app-register',
@@ -16,9 +16,9 @@ import { strongPassword } from '../../../utilities/validators';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RegisterComponent implements OnInit {
-  private formBuilder = inject(FormBuilder);
-  private userService = inject(UserService);
-  private router = inject(Router);
+  private readonly formBuilder = inject(FormBuilder);
+  private readonly router = inject(Router);
+  private readonly authStore = inject(AuthStore);
 
   public registerForm : FormGroup;
 
@@ -32,7 +32,7 @@ export class RegisterComponent implements OnInit {
     })
   }
 
-  public async send(): Promise<void> {
+  public send(): void {
     const registerData : RegisterDto = {
       email: this.registerForm.get('emailControl').value,
       password: this.registerForm.get('passwordControl').value,
@@ -41,7 +41,7 @@ export class RegisterComponent implements OnInit {
       lastName: this.registerForm.get('lastNameControl').value,
     }
 
-    await this.userService.register(registerData);
+    this.authStore.register(registerData);
     this.router.navigateByUrl('/app');
   }
 }

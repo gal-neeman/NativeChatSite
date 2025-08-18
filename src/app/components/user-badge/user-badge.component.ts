@@ -3,8 +3,8 @@ import {MatMenuModule} from '@angular/material/menu';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import { TitleCasePipe } from '@angular/common';
-import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
+import { AuthStore } from '../../storage/auth.store';
 
 @Component({
   selector: 'app-user-badge',
@@ -13,19 +13,15 @@ import { Router } from '@angular/router';
   styleUrl: './user-badge.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class UserBadgeComponent implements OnInit {
-  private userService = inject(UserService);
-  private router = inject(Router);
+export class UserBadgeComponent {
+  private readonly router = inject(Router);
+  private readonly authStore = inject(AuthStore);
 
-  public username = signal<string>(undefined);
+  public username = computed(() => "@" + this.authStore.user().username);
   public initials = computed(() => this.username()[1]);
 
-  ngOnInit(): void {
-    this.username.set("@" + this.userService.getUser().username);
-  }
-
   public logout(): void {
-    this.userService.logout();
+    this.authStore.logout();
     this.router.navigateByUrl("login");
   }
 }

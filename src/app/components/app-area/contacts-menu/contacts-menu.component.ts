@@ -1,10 +1,10 @@
-import { ChangeDetectionStrategy, Component, inject, Input, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, Input, OnInit, Signal, signal } from '@angular/core';
 import { BotCardComponent } from "../bot-card/bot-card.component";
 import { NewBuddyButtonComponent } from "../new-buddy-button/new-buddy-button.component";
 import { Bot } from '../../../models/bot.model';
-import { BotService } from '../../../services/bot.service';
-import { UserService } from '../../../services/user.service';
 import { BotDto } from '../../../models/botDto.model';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { BotStore } from '../../../storage/bot.store';
 
 @Component({
   selector: 'app-contacts-menu',
@@ -13,23 +13,21 @@ import { BotDto } from '../../../models/botDto.model';
   styleUrl: './contacts-menu.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ContactsMenuComponent {
-  private botService = inject(BotService);
-  private userService = inject(UserService);
+export class ContactsMenuComponent implements OnInit {
+  private botStore = inject(BotStore);
 
-  public bots = signal<Bot[]>(undefined);
+  public bots: Signal<Bot[]>;
 
-  async ngOnInit(): Promise<void> {
-    this.bots.set(await this.botService.getUserBots());
+  ngOnInit(): void {
+    this.botStore.ensureLoaded();
+    this.bots = this.botStore.bots;
   }
 
-  public async deleteBot(bot: Bot) : Promise<void> {
-    await this.botService.deleteBot(bot.id);
-    this.bots.set(this.bots().filter(b => b.id != bot.id));
+  public deleteBot(bot: Bot): void {
+    this.botStore.deleteBot(bot.id);
   }
 
-  public async addBot(bot: BotDto) : Promise<void> {
-    const dbBot = await this.botService.addBot(bot, this.userService.getUser().id);
-    this.bots.update(current => [...current, dbBot]);
+  public addBot(bot: BotDto) : void {
+    this.botStore.addBot(bot);
   }
 }

@@ -1,10 +1,11 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, Signal, signal } from '@angular/core';
 import { ContactsMenuComponent } from "../../app-area/contacts-menu/contacts-menu.component";
 import { ChatComponent } from "../../app-area/chat/chat.component";
 import { UserBadgeComponent } from "../../user-badge/user-badge.component";
-import { BotService } from '../../../services/bot.service';
 import { Bot } from '../../../models/bot.model';
 import { CommonModule } from '@angular/common';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { BotStore } from '../../../storage/bot.store';
 
 @Component({
   selector: 'app-app',
@@ -14,11 +15,12 @@ import { CommonModule } from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent implements OnInit {
-  private botService = inject(BotService);
+  private readonly botStore = inject(BotStore);
 
-  public bots = signal<Bot[]>(undefined);
+  public bots: Signal<Bot[]>;
 
-  async ngOnInit(): Promise<void> {
-    this.bots.set(await this.botService.getUserBots());
+  ngOnInit(): void {
+    this.botStore.ensureLoaded();
+    this.bots = this.botStore.bots;
   }
 }

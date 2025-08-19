@@ -22,7 +22,8 @@ export class MessageService {
             createdAt: moment(m.createdAt).utc(true).tz("Asia/Jerusalem").toDate(),
             id: m.id,
             receiverId: m.receiverId,
-            senderId: m.senderId
+            senderId: m.senderId,
+            clientId: m.clientId
         }))
         return messages;
     }

@@ -1,4 +1,4 @@
-import { AfterViewChecked, ChangeDetectionStrategy, Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { AfterViewChecked, ChangeDetectionStrategy, Component, DoCheck, ElementRef, Input, ViewChild } from '@angular/core';
 import { Message } from '../../../models/message.model';
 import { MessageComponent } from "../message/message.component";
 import { ChatAgent } from '../../../models/chatAgent.model';

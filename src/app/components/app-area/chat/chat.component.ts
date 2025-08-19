@@ -8,11 +8,11 @@ import { User } from '../../../models/user.model';
 import { MessageDto } from '../../../models/messageDto.model';
 import { MessagesContainerComponent } from "../../chat-area/messages-container/messages-container.component";
 import { v4 as uuidv4 } from 'uuid';
-import moment from 'moment';
 import { SocketService } from '../../../services/socket.service';
 import { EventData } from '../../../models/eventData.model';
 import { tap } from 'rxjs';
 import { AuthStore } from '../../../storage/auth.store';
+import { ZERO_GUID } from '../../../utilities/constants';
 
 @Component({
   selector: 'app-chat',
@@ -25,8 +25,6 @@ export class ChatComponent implements OnInit {
   public bot: Bot | null = null;
   public chat = signal<Message[]>([]);
   public user: User;
-
-  private tempMessages: Message[] = [];
 
   private readonly contactSelectionService = inject(ContactSelectionService);
   private readonly messageService = inject(MessageService);
@@ -47,40 +45,28 @@ export class ChatComponent implements OnInit {
     this.user = this.authStore.user();
 
     this.socketService.messages$
-    .pipe(
-      tap(m => {
-        m.receivedMessage.createdAt = new Date(m.receivedMessage.createdAt);
-        m.responseMessage.createdAt = new Date(m.responseMessage.createdAt);
-      }),
-    )
-    .subscribe(m => {
-      const tempMessage = this.tempMessages.find(tmpMsg => tmpMsg.createdAt = m.receivedMessage.createdAt);
-      if (tempMessage != null) {
-        this.tempMessages = this.tempMessages.filter(m => m.id != tempMessage.id);
-        this.chat.update(() => this.chat().filter(m => m.id != tempMessage.id));
-      }
-
-      this.chat.update(() => [...this.chat(), m.responseMessage]);
-      if (m.receivedMessage != null)
-        this.chat.update(() => [...this.chat(), m.receivedMessage].sort((a, b) => moment(a.createdAt).isAfter(b.createdAt) ? 1 : -1));
-    })
+      .pipe(
+        tap(m => {
+          m.receivedMessage.createdAt = new Date(m.receivedMessage.createdAt);
+          m.responseMessage.createdAt = new Date(m.responseMessage.createdAt);
+        }),
+        tap(m => {
+          this.chat.update(messages => messages.map(
+            message => message.clientId === m.receivedMessage.clientId ? m.receivedMessage : message
+          ));
+          this.chat.update(messages => [...messages, m.responseMessage]);
+        })
+      )
+      .subscribe()
   }
 
   public async handleContactChange() {
     this.chat.set((await this.messageService.getChatMessages(this.bot.id)));
   }
 
-  public async onMessageSent(messageContent: string) {
-    const message: MessageDto = {
-      content: messageContent,
-      createdAt: new Date(),
-      receiverId: this.bot.id,
-      senderId: this.user.id
-    }
-
-    const tempMessage = this.generateTempMessage(message);
-    this.tempMessages.push(tempMessage);
-
+  public onMessageSent(messageContent: string) {
+    const message = this.getMessageDtoFromContent(messageContent);
+    const tempMessage = this.getMessageFromMessageDto(message);
     this.chat.update(() => [...this.chat(), tempMessage]);
 
     const eventData: EventData<MessageDto> = {
@@ -90,13 +76,26 @@ export class ChatComponent implements OnInit {
     this.socketService.emit(eventData);
   }
 
-  private generateTempMessage(message: MessageDto): Message {
+  private getMessageDtoFromContent(content: string): MessageDto {
+    const message: MessageDto = {
+      content: content,
+      createdAt: new Date(),
+      receiverId: this.bot.id,
+      senderId: this.user.id,
+      clientId: uuidv4()
+    }
+
+    return message;
+  }
+
+  private getMessageFromMessageDto(message: MessageDto): Message {
     const tempMessage: Message = {
       content: message.content,
       createdAt: new Date(message.createdAt),
-      id: uuidv4(),
+      id: message.clientId,
       receiverId: message.receiverId,
-      senderId: message.senderId
+      senderId: message.senderId,
+      clientId: message.clientId
     }
 
     return tempMessage;

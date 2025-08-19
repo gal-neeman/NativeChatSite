@@ -1,5 +1,5 @@
 <div class="wrapper" #messagesContainer>
-    @for (message of messages; track $index) {
+    @for (message of messages; track message.id) {
         @if ($index > 0 && isDayDifferent(messages[$index].createdAt, messages[$index - 1].createdAt)) {
             <app-date-seperator [date]="message.createdAt"></app-date-seperator>
         }

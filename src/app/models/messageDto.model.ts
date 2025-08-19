@@ -3,4 +3,5 @@ export class MessageDto {
     public senderId: string;
     public content: string;
     public createdAt: Date;
+    public clientId: string | null;
 }

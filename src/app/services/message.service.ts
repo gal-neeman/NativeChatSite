@@ -5,7 +5,6 @@ import { environment } from "../environments/environment";
 import { firstValueFrom } from "rxjs";
 import { MessageDto } from "../models/messageDto.model";
 import { MessageResponse } from "../models/messageResponse.model";
-import moment from "moment-timezone";
 
 @Injectable({
     providedIn: "root"
@@ -18,12 +17,8 @@ export class MessageService {
         let messages = await firstValueFrom(messages$);
 
         messages = messages.map(m => ({
-            content: m.content,
-            createdAt: moment(m.createdAt).utc(true).tz("Asia/Jerusalem").toDate(),
-            id: m.id,
-            receiverId: m.receiverId,
-            senderId: m.senderId,
-            clientId: m.clientId
+            ...m,
+            createdAt: new Date(m.createdAt),
         }))
         return messages;
     }

@@ -19,7 +19,14 @@ export class SocketService {
 
   messages$ = this.events$.pipe(
     filter(e => (e as EventData<MessageResponse>).eventName == 'message'),
-    map(e => (e as EventData<MessageResponse>).data as MessageResponse)
+    map(e => (e as EventData<MessageResponse>).data as MessageResponse),
+    map((messageResponse) => {
+      const response = { ...messageResponse };
+      response.receivedMessage.createdAt = new Date(response.receivedMessage.createdAt);
+      response.responseMessage.createdAt = new Date(response.responseMessage.createdAt);
+
+      return response;
+    })
   )
 
   private initSocket() {

@@ -7,6 +7,8 @@ import { Credentials } from '../models/credentials';
 import { RegisterDto } from '../models/register.dto';
 import { Message } from '../models/message.model';
 import { apiRoutes } from '../utilities/apiRoutes';
+import { MessageDto } from '../models/messageDto.model';
+import { MessageResponse } from '../models/messageResponse.model';
 
 type queryParameter = {
   key: string,
@@ -19,8 +21,7 @@ type queryParameter = {
 export class ApiService {
   constructor(
     private httpClient: HttpClient
-  ) 
-  { }
+  ) { }
 
   public getUserBots(): Observable<Bot[]> {
     const bots$ = this.httpClient.get<Bot[]>(`${apiRoutes.bot}`);
@@ -28,13 +29,11 @@ export class ApiService {
   }
 
   public deleteUserBot(botId: string) {
-    const delete$ = this.httpClient.delete(`${apiRoutes.bot}${botId}`);
-    return delete$;
+    return this.httpClient.delete(`${apiRoutes.bot}${botId}`);
   }
 
   addBot(botDto: BotDto) {
-    const bot$ = this.httpClient.post<Bot>(`${apiRoutes.bot}create`, botDto);
-    return bot$;
+    return this.httpClient.post<Bot>(`${apiRoutes.bot}create`, botDto);
   }
 
   login(loginData: Credentials) {

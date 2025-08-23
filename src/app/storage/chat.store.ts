@@ -7,6 +7,9 @@ import { rxMethod } from "@ngrx/signals/rxjs-interop";
 import { catchError, EMPTY, exhaustMap, filter, map, takeWhile, tap } from "rxjs";
 import { ApiService } from "../services/api.service";
 import { NUM_MESSAGES_LOAD } from "../utilities/constants";
+import { MessageDto } from "../models/messageDto.model";
+import { EventData } from "../models/eventData.model";
+import { SocketService } from "../services/socket.service";
 
 type ConversationState = {
   messages: Message[];
@@ -36,7 +39,7 @@ export const ChatStore = signalStore(
     activeChat: computed(() => store.chats().get(contactService.getContact()?.id)?.messages ?? null)
   })),
 
-  withMethods((store, api = inject(ApiService)) => ({
+  withMethods((store, api = inject(ApiService), socket = inject(SocketService)) => ({
     loadInitial: rxMethod<string>(src$ =>
       src$.pipe(
         filter(botId => !store.chats().get(botId) && store.status() !== StoreStatuses.loading),
@@ -70,10 +73,36 @@ export const ChatStore = signalStore(
         )
       )
     ),
+
+    sendMessage: rxMethod<{ botId: string, messageDto: MessageDto }>($src => $src.pipe(
+      map((messageData) => {
+        const tempMessage = getMessageFromMessageDto(messageData.messageDto);
+        const updatedChats = new Map(store.chats());
+        const updated: ConversationState = {
+          messages: [...store.chats().get(messageData.botId).messages, tempMessage],
+          nextCursor: store.chats().get(messageData.botId).nextCursor
+        };
+        updatedChats.set(messageData.botId, updated);
+        patchState((store), {
+          chats: updatedChats,
+          status: StoreStatuses.loaded,
+        })
+
+        const eventData: EventData<MessageDto> = {
+          data: messageData.messageDto,
+          eventName: 'message'
+        };
+        return eventData;
+      }),
+      tap(eventData => {
+        socket.emit(eventData);
+      })
+    ))
   })),
 
   withHooks(store => {
     const contactService = inject(ContactSelectionService);
+    const socketService = inject(SocketService);
 
     effect(() => {
       const contact = contactService.getContact();
@@ -84,6 +113,39 @@ export const ChatStore = signalStore(
       };
     })
 
-    return {};
+    const messages$ = socketService.messages$;
+
+    return {
+      onInit() {
+        messages$.pipe(
+          tap(m => {
+            const updatedChats = new Map(store.chats());
+            const botId = m.responseMessage.senderId;
+            const updated: ConversationState = {
+              messages: [...store.chats().get(botId).messages, m.responseMessage],
+              nextCursor: store.chats().get(botId).nextCursor
+            };
+            updatedChats.set(botId, updated);
+            patchState((store), {
+              chats: updatedChats,
+            })
+          })
+        )
+          .subscribe()
+      }
+    };
   })
 )
+
+function getMessageFromMessageDto(message: MessageDto): Message {
+  const tempMessage: Message = {
+    content: message.content,
+    createdAt: new Date(message.createdAt),
+    id: message.clientId,
+    receiverId: message.receiverId,
+    senderId: message.senderId,
+    clientId: message.clientId
+  }
+
+  return tempMessage;
+}

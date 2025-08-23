@@ -1,1 +1,1 @@
-export const NUM_MESSAGES_LOAD = 5;
+export const NUM_MESSAGES_LOAD = 50;

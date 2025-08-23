@@ -1,18 +1,14 @@
-import { ChangeDetectionStrategy, Component, effect, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, OnInit, Signal } from '@angular/core';
 import { MessageBoxComponent } from "../message-box/message-box.component";
 import { Bot } from '../../../models/bot.model';
-import { ContactSelectionService } from '../../../services/contactSelection.service';
 import { Message } from '../../../models/message.model';
-import { MessageService } from '../../../services/message.service';
 import { User } from '../../../models/user.model';
 import { MessageDto } from '../../../models/messageDto.model';
 import { MessagesContainerComponent } from "../../chat-area/messages-container/messages-container.component";
 import { v4 as uuidv4 } from 'uuid';
-import { SocketService } from '../../../services/socket.service';
-import { EventData } from '../../../models/eventData.model';
-import { tap } from 'rxjs';
 import { AuthStore } from '../../../storage/auth.store';
-import { ZERO_GUID } from '../../../utilities/constants';
+import { ChatStore } from '../../../storage/chat.store';
+import { ContactSelectionService } from '../../../services/contactSelection.service';
 
 @Component({
   selector: 'app-chat',
@@ -23,57 +19,27 @@ import { ZERO_GUID } from '../../../utilities/constants';
 })
 export class ChatComponent implements OnInit {
   public bot: Bot | null = null;
-  public chat = signal<Message[]>([]);
   public user: User;
+  public chat: Signal<Message[]>;
 
-  private readonly contactSelectionService = inject(ContactSelectionService);
-  private readonly messageService = inject(MessageService);
-  private readonly socketService = inject(SocketService);
+  private readonly chatStore = inject(ChatStore);
   private readonly authStore = inject(AuthStore);
+  private readonly contactSelectionService = inject(ContactSelectionService);
 
   constructor() {
     effect(() => {
       this.bot = this.contactSelectionService.getContact();
-
-      if (this.bot) {
-        this.handleContactChange();
-      }
     })
   }
 
   public ngOnInit(): void {
     this.user = this.authStore.user();
-
-    this.socketService.messages$
-      .pipe(
-        tap(m => {
-          m.receivedMessage.createdAt = new Date(m.receivedMessage.createdAt);
-          m.responseMessage.createdAt = new Date(m.responseMessage.createdAt);
-        }),
-        tap(m => {
-          this.chat.update(messages => messages.map(
-            message => message.clientId === m.receivedMessage.clientId ? m.receivedMessage : message
-          ));
-          this.chat.update(messages => [...messages, m.responseMessage]);
-        })
-      )
-      .subscribe()
-  }
-
-  public async handleContactChange() {
-    this.chat.set((await this.messageService.getChatMessages(this.bot.id)));
+    this.chat = this.chatStore.activeChat;
   }
 
   public onMessageSent(messageContent: string) {
-    const message = this.getMessageDtoFromContent(messageContent);
-    const tempMessage = this.getMessageFromMessageDto(message);
-    this.chat.update(() => [...this.chat(), tempMessage]);
-
-    const eventData: EventData<MessageDto> = {
-      data: message,
-      eventName: 'message'
-    };
-    this.socketService.emit(eventData);
+    const messageDto = this.getMessageDtoFromContent(messageContent);
+    this.chatStore.sendMessage({ botId: this.bot.id, messageDto: messageDto });
   }
 
   private getMessageDtoFromContent(content: string): MessageDto {
@@ -86,18 +52,5 @@ export class ChatComponent implements OnInit {
     }
 
     return message;
-  }
-
-  private getMessageFromMessageDto(message: MessageDto): Message {
-    const tempMessage: Message = {
-      content: message.content,
-      createdAt: new Date(message.createdAt),
-      id: message.clientId,
-      receiverId: message.receiverId,
-      senderId: message.senderId,
-      clientId: message.clientId
-    }
-
-    return tempMessage;
   }
 }
